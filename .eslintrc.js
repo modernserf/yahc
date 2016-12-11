@@ -15,5 +15,6 @@ module.exports = {
         'indent':['error',4],
         'comma-dangle':['error','always-multiline'],
         'quotes':['error','double'],
+        'react/prop-types':['off'] // TODO
     }
 };

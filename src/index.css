@@ -1,4 +1,4 @@
-@import "parc-place/stylesheet.css";
+@import "assets/parc-place/stylesheet.css";
 
 * {
     position: relative;
@@ -12,6 +12,9 @@ html {
 body {
     font-family: "ParcPlace", sans-serif;
     height: 100%;
+}
+
+body, ul, ol {
     margin: 0;
     padding: 0;
 }
