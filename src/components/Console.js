@@ -17,6 +17,10 @@ const LogWrap = styled.div`
 const Log = styled.ul`
     overflow: scroll;`
 
+const LogItem = styled.li`
+    margin: 0.5em 1em;
+    list-style-type: none;`
+
 const ConsoleInput = styled.textarea`
     flex-shrink: 0;
     display: block;
@@ -49,7 +53,7 @@ class Console extends React.Component {
             <Container>
                 <LogWrap>
                     <Log>
-                        {log.map((msg, i) => <li key={i}>{msg}</li>)}
+                        {log.map((msg, i) => <LogItem key={i}>{msg}</LogItem>)}
                     </Log>
                 </LogWrap>
                 <ConsoleInput value={message}

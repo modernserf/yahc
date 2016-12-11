@@ -1,14 +1,15 @@
 import React from "react"
 import styled from "styled-components"
 import Console from "./Console"
+import Workspace from "./Workspace"
 
 const Container = styled.div`
     display: flex;
     flex-direction: row;
     height: 100%;`
 
-const Workspace = styled.div`
-    flex-grow: 1;
+const WorkspaceWrap = styled.div`
+    flex-grow: 2;
     background-color: #ccc;`
 
 const Tools = styled.div`
@@ -30,7 +31,9 @@ export default class App extends React.Component {
     render () {
         return (
             <Container>
-                <Workspace/>
+                <WorkspaceWrap>
+                    <Workspace/>
+                </WorkspaceWrap>
                 <Tools>
                     <Explorer>
                         explorer goes here
