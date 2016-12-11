@@ -1,0 +1,21 @@
+@import "parc-place/stylesheet.css";
+
+* {
+    position: relative;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "ParcPlace", sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#root {
+    height: 100%;
+}
