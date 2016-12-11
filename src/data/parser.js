@@ -8,7 +8,7 @@ const PString = P.seqMap(
 
 const PNumber = P.regexp(/\d+/).map((str) => ["Number", Number(str)])
 
-const selector = P.regexp(/[^\d":]+:/)
+const selector = P.regexp(/[^\d":.]+:/)
     .map((str) => str.trim().replace(":", ""))
 
 const pair = P.seqMap(
@@ -17,8 +17,15 @@ const pair = P.seqMap(
     P.alt(PString, PNumber),
     (key, __, value) => [key, value])
 
-const PMessage = P.sepBy(pair, P.whitespace)
+const messageNoArgs = P.regexp(/[^\d":.]+\./)
+    .map((str) => ["Message", [
+        [str.trim().replace(".", ""), []],
+    ]])
+
+const messageWithArgs = P.sepBy(pair, P.whitespace)
     .map((pairs) => ["Message", pairs])
+
+const PMessage = P.alt(messageNoArgs, messageWithArgs)
 
 const PExpression = P.optWhitespace.then(
     P.alt(PNumber, PString, PMessage)

@@ -14,6 +14,7 @@ export const userMessages = {
         ({ type: "user/changeColor", payload: { id, color } }),
     "draw shape:named:at x:y:": ([type, id, x, y]) =>
         ({ type: "user/createShape", payload: { type, id, x, y } }),
+    "clear:": () => ({ type: "user/clear" }),
 }
 
 function evalMessage ([type, body], str) {
@@ -24,7 +25,7 @@ function evalMessage ([type, body], str) {
         if (userMessages[selector]) {
             return userMessages[selector](args)
         }
-        return { type: "user/unknownMessage", payload: str }
+        return { type: "user/unknownMessage", payload: { text: str, ast: [type, body] } }
     }
     default:
         return { type: "user/tryExpression", payload: body }
@@ -74,6 +75,8 @@ const workspaceReducer = (state = initWorkspace, action) => {
         const { type, id, x, y } = action.payload
         return state.concat({ type, id, x, y, color: "black" })
     }
+    case "user/clear":
+        return state.slice(0, 1)
     default:
         return state
     }

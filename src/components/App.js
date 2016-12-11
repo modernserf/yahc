@@ -9,7 +9,7 @@ const Container = styled.div`
     height: 100%;`
 
 const WorkspaceWrap = styled.div`
-    flex-grow: 2;
+    flex-basis: 66%;
     background-color: #ccc;`
 
 const Tools = styled.div`
@@ -23,8 +23,7 @@ const Explorer = styled.div`
     background-color: #ccc;`
 
 const ConsoleWrap = styled.div`
-    flex-shrink: 0;
-    flex-basis: 50%;
+    flex-basis: 33%;
     display: flex;`
 
 export default class App extends React.Component {

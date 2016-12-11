@@ -26,23 +26,49 @@ const ConsoleInput = styled.textarea`
     display: block;
     width: 100%;
     padding: 1em
-    font-family: inherit;`
+    font-family: inherit;
+    font-size: inherit;`
 
 class Console extends React.Component {
     state = {
         message: "",
+        logCursor: 0,
     }
     onChange = (e) => {
         this.setState({ message: e.target.value })
     }
     onSubmit = () => {
         this.props.userSentMessage(this.state.message)
-        this.setState({ message: "" })
+        this.setState({ message: "", logCursor: 0 })
     }
     onKeyDown = (e) => {
-        if (e.keyCode === 13) {
+        switch (e.keyCode) {
+        case 13: // return
             e.preventDefault()
             this.onSubmit()
+            return
+        case 38: { // up
+            e.preventDefault()
+            const { log } = this.props
+            const nextCursor = (log.length + (this.state.logCursor - 1)) % log.length
+            this.setState({
+                logCursor: nextCursor,
+                message: log[nextCursor],
+            })
+            return
+        }
+        case 40: { // down
+            e.preventDefault()
+            const { log } = this.props
+            const nextCursor = (log.length + (this.state.logCursor + 1)) % log.length
+            this.setState({
+                logCursor: nextCursor,
+                message: log[nextCursor],
+            })
+            return
+        }
+        default:
+            return
         }
     }
     render () {
