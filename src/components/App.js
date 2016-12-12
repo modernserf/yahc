@@ -2,6 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import Console from "./Console"
 import Workspace from "./Workspace"
+import { MessageExplorer } from "../messages"
 
 const Container = styled.div`
     display: flex;
@@ -17,10 +18,9 @@ const Tools = styled.div`
     flex-direction: column;
     flex-grow: 1;`
 
-const Explorer = styled.div`
+const ExplorerWrap = styled.div`
     flex-grow: 1;
-    flex-shrink: 0;
-    background-color: #ccc;`
+    flex-shrink: 0;`
 
 const ConsoleWrap = styled.div`
     flex-basis: 33%;
@@ -34,9 +34,12 @@ export default class App extends React.Component {
                     <Workspace/>
                 </WorkspaceWrap>
                 <Tools>
-                    <Explorer>
-                        explorer goes here
-                    </Explorer>
+                    <ExplorerWrap>
+                        <details>
+                            <summary>Messages</summary>
+                            <MessageExplorer/>
+                        </details>
+                    </ExplorerWrap>
                     <ConsoleWrap>
                         <Console/>
                     </ConsoleWrap>

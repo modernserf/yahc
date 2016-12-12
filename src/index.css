@@ -22,3 +22,7 @@ body, ul, ol {
 #root {
     height: 100%;
 }
+
+li {
+    list-style-type: none;
+}

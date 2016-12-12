@@ -18,8 +18,7 @@ const Log = styled.ul`
     overflow: scroll;`
 
 const LogItem = styled.li`
-    display: flex;
-    list-style-type: none;`
+    display: flex;`
 
 const LogText = styled.div`
     padding: 0.5em 0.5em 0;`
