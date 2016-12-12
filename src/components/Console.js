@@ -18,16 +18,31 @@ const Log = styled.ul`
     overflow: scroll;`
 
 const LogItem = styled.li`
-    margin: 0.5em 1em;
+    display: flex;
     list-style-type: none;`
 
-const ConsoleInput = styled.textarea`
+const LogText = styled.div`
+    padding: 0.5em 0.5em 0;`
+
+const StatusBlock = styled.div`
+    padding: 0.5em 0.5em 0;
+    width: 1.5em;`
+
+const InputWrap = styled.div`
+    border-top: 1px solid #ccc;
     flex-shrink: 0;
+    display: flex;`
+
+const ConsoleInput = styled.textarea`
+    border: none;
     display: block;
     width: 100%;
-    padding: 1em
+    padding: 0.5em;
     font-family: inherit;
-    font-size: inherit;`
+    font-size: inherit;
+    &:focus {
+        outline: none;
+    }`
 
 class Console extends React.Component {
     state = {
@@ -47,29 +62,26 @@ class Console extends React.Component {
             e.preventDefault()
             this.onSubmit()
             return
-        case 38: { // up
+        case 38: // up
             e.preventDefault()
-            const { log } = this.props
-            const nextCursor = (log.length + (this.state.logCursor - 1)) % log.length
-            this.setState({
-                logCursor: nextCursor,
-                message: log[nextCursor],
-            })
+            this.moveCursor(-1)
             return
-        }
-        case 40: { // down
+        case 40:  // down
             e.preventDefault()
-            const { log } = this.props
-            const nextCursor = (log.length + (this.state.logCursor + 1)) % log.length
-            this.setState({
-                logCursor: nextCursor,
-                message: log[nextCursor],
-            })
+            this.moveCursor(1)
             return
-        }
         default:
             return
         }
+    }
+    moveCursor = (offset) => {
+        const { log } = this.props
+        if (!log.length) { return }
+        const nextCursor = (log.length + (this.state.logCursor + offset)) % log.length
+        this.setState({
+            logCursor: nextCursor,
+            message: log[nextCursor].message,
+        })
     }
     render () {
         const { log } = this.props
@@ -78,13 +90,19 @@ class Console extends React.Component {
         return (
             <Container>
                 <LogWrap>
-                    <Log>
-                        {log.map((msg, i) => <LogItem key={i}>{msg}</LogItem>)}
-                    </Log>
+                    <Log>{log.map(({ message, error }, i) =>
+                        <LogItem key={i}>
+                            <StatusBlock>{error ? "❌" : "✅"}</StatusBlock>
+                            <LogText>{message}</LogText>
+                        </LogItem>
+                    )}</Log>
                 </LogWrap>
-                <ConsoleInput value={message}
-                    onChange={this.onChange}
-                    onKeyDown={this.onKeyDown} />
+                <InputWrap>
+                    <StatusBlock>{">"}</StatusBlock>
+                    <ConsoleInput value={message}
+                        onChange={this.onChange}
+                        onKeyDown={this.onKeyDown} />
+                </InputWrap>
             </Container>
         )
     }

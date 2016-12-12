@@ -2,56 +2,85 @@ import { createStore, applyMiddleware, combineReducers } from "redux"
 import createSagaMiddleware, { takeEvery } from "redux-saga"
 import createLogger from "redux-logger"
 import { put } from "redux-saga/effects"
-import { parseMessage } from "./parser"
+import { parseMessage, parseSelectorDef } from "./parser"
 
 export const actions = {
     userSentMessage: (msg) => ({ type: "userSentMessage", payload: msg }),
 }
 
-export const userMessages = {
-    "move:to x:y:": ([id, x, y]) => ({ type: "user/move", payload: { id, x, y } }),
-    "change the color of:to:": ([id, color]) =>
-        ({ type: "user/changeColor", payload: { id, color } }),
-    "draw shape:named:at x:y:": ([type, id, x, y]) =>
-        ({ type: "user/createShape", payload: { type, id, x, y } }),
-    "clear:": () => ({ type: "user/clear" }),
-}
+const messages = [
+    { selector: "move:id to x:x y:y", action: "move" },
+    { selector: "change the color of:id to:color", action: "changeColor" },
+    { selector: "draw shape:type named:id", action: "createShape" },
+    { selector: "clear", action: "clear" },
+    { selector: "resize:id to width:width height:height", action: "resize" },
+]
+
+const bySelector = messages.reduce((m, { selector, action }) => {
+    const parsed = parseSelectorDef(selector)
+
+    const key = parsed.map(([k]) => k).join(":")
+    const argNames = parsed.map(([k, v]) => v)
+
+    m[key] = (args, str) => {
+        const payload = args.reduce((p, value, i) => {
+            const name = argNames[i]
+            p[name] = value
+            return p
+        }, {})
+
+        return { type: `user/${action}`, payload, str }
+    }
+
+    return m
+}, {})
 
 function evalMessage ([type, body], str) {
     switch (type) {
     case "Message": {
-        const selector = body.map(([k]) => k + ":").join("")
+        const selector = body.map(([k]) => k).join(":")
         const args = body.map(([k, v]) => v[1])
-        if (userMessages[selector]) {
-            return userMessages[selector](args)
+        if (bySelector[selector]) {
+            return bySelector[selector](args, str)
         }
-        return { type: "user/unknownMessage", payload: { text: str, ast: [type, body] } }
+        return { type: "user/unknownMessage", payload: [type, body], str, error: true }
     }
     default:
-        return { type: "user/tryExpression", payload: body }
+        return { type: "user/tryExpression", payload: body, str }
     }
 }
 
 const parseUserMessages = takeEvery("userSentMessage", function * ({ payload: str }) {
-    const { status, value } = parseMessage(str)
-    if (status) {
-        const message = evalMessage(value, str)
+    const parsed = parseMessage(str)
+    if (parsed.status) {
+        const message = evalMessage(parsed.value, str)
         yield put(message)
     } else {
-        yield put({ type: "user/parseError", payload: str })
+        yield put({ type: "user/parseError", payload: parsed, str, error: true })
     }
 })
 
 const logReducer = (state = [], action) => {
-    if (action.type === "userSentMessage") {
-        return state.concat(action.payload)
+    if (action.str) {
+        return state.concat([{
+            message: action.str,
+            error: action.error,
+        }])
     }
     return state
 }
 
 const initWorkspace = [
-    { type: "card", id: "the card", x: 0, y: 0, color: "white" },
-    { type: "circle", id: "the circle", x: 100, y: 100, color: "red" },
+    {
+        type: "card", id: "the card",
+        width: 500, height: 500,
+        color: "white",
+    },
+    {
+        type: "circle", id: "the circle",
+        x: 100, y: 100, width: 100, height: 100,
+        color: "red",
+    },
 ]
 
 function updateList (state, id, fn) {
@@ -71,9 +100,13 @@ const workspaceReducer = (state = initWorkspace, action) => {
         const { id, color } = action.payload
         return updateList(state, id, (s) => ({ ...s, color }))
     }
+    case "user/resize": {
+        const { id, width, height } = action.payload
+        return updateList(state, id, (s) => ({ ...s, width, height }))
+    }
     case "user/createShape": {
-        const { type, id, x, y } = action.payload
-        return state.concat({ type, id, x, y, color: "black" })
+        const { type, id } = action.payload
+        return state.concat({ type, id, x: 0, y: 0, width: 100, height: 100, color: "black" })
     }
     case "user/clear":
         return state.slice(0, 1)

@@ -17,5 +17,6 @@ module.exports = {
         'quotes':['error','double'],
         'react/prop-types':['off'], // TODO
         'object-curly-spacing':["error", 'always'],
+        'object-property-newline': ['off'],
     }
 };

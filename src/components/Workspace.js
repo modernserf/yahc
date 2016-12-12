@@ -12,24 +12,27 @@ const CardWrap = styled.div`
 
 const Card = styled.div`
     position: absolute;
-    width: 500px;
-    height: 500px;
-    background-color: white;
-    box-shadow: 0 0 4px 4px rgba(0,0,0,0.1);`
+    width: ${({ width }) => width}px;
+    height: ${({ height }) => height}px;
+    background-color: ${({ color }) => color};
+    box-shadow: 0 0 8px 4px rgba(0,0,0,0.1);`
 
-const Circle = styled.div`
+const Rectangle = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    width: 100px;
-    height: 100px;
+    width: ${({ width }) => width}px;
+    height: ${({ height }) => height}px;
     background-color: ${({ color }) => color};
-    border-radius: 50%;
-    transform: ${({x = 0, y = 0}) => `translate(${x}px,${y}px)`};`
+    transform: ${({ x = 0, y = 0 }) => `translate(${x}px,${y}px)`};`
+
+const Circle = styled(({ className, ...props }) => <Rectangle className={className} {...props} />)`
+    border-radius: 50%;`
 
 const components = {
     card: Card,
     circle: Circle,
+    rectangle: Rectangle,
 }
 
 class Workspace extends React.Component {
@@ -38,9 +41,9 @@ class Workspace extends React.Component {
 
         return (
             <CardWrap>
-                {workspace.map(({ type, id, x, y, color }) => {
+                {workspace.map(({ type, id, ...props }) => {
                     const Component = components[type]
-                    return <Component key={id} x={x} y={y} color={color}/>
+                    return <Component key={id} {...props}/>
                 })}
             </CardWrap>
         )
